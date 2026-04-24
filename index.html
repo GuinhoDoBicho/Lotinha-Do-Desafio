@@ -5,70 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LOTINHA DO DESAFIO DO GUINHO</title>
     <style>
+        /* CONFIGURAÇÕES ORIGINAIS (NÃO MEXER) */
         :root {
             --primary-orange: #f39c12;
             --table-header: #34495e;
             --accent-red: #e74c3c;
             --whatsapp-green: #25d366;
             --result-blue: #3498db;
-            --hit-green: #2ecc71;
         }
 
         * { box-sizing: border-box; }
 
-        /* Estilo da Tela de Bloqueio */
-        #telaBloqueio {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #fce5cd;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .login-box {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            border: 3px solid #000;
-            box-shadow: 6px 6px 0px #000;
-            max-width: 350px;
-            width: 100%;
-        }
-
-        .login-box h2 { margin-top: 0; color: #000; }
-
-        .input-senha {
-            width: 100%;
-            padding: 15px;
-            margin: 15px 0;
-            border: 2px solid #ccc;
-            border-radius: 5px;
-            font-size: 1.1rem;
-            text-align: center;
-        }
-
-        .btn-entrar {
-            width: 100%;
-            background: var(--primary-orange);
-            color: black;
-            padding: 15px;
-            border: none;
-            border-radius: 5px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            cursor: pointer;
-            text-transform: uppercase;
-        }
-
-        /* Ocultar o site inicialmente */
-        #conteudoSite { display: none; }
-
-        /* Estilos Originais do Site */
         body {
             font-family: 'Arial', sans-serif;
             background-color: #fce5cd;
@@ -77,6 +24,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
         }
 
         .header {
@@ -84,11 +32,13 @@
             width: 100%;
             max-width: 600px;
             text-align: center;
-            padding: 15px;
+            padding: 15px 10px;
             border: 3px solid #000;
             box-shadow: 4px 4px 0px #000;
             margin-bottom: 20px;
         }
+
+        .header h1 { margin: 0; font-size: 1.4rem; text-transform: uppercase; font-weight: 900; }
 
         .container {
             background: white;
@@ -114,6 +64,8 @@
             cursor: pointer;
             font-weight: bold;
             border-radius: 5px;
+            font-size: 1rem;
+            display: flex; justify-content: center; align-items: center;
         }
 
         .dezena.selected { background-color: var(--accent-red); color: white; border-color: #c0392b; }
@@ -126,6 +78,7 @@
             border-radius: 5px;
             font-weight: bold;
             border: 1px solid #d1e9f9;
+            font-size: 0.9rem;
         }
 
         .btn-group { display: flex; gap: 10px; margin: 10px 0; }
@@ -144,104 +97,137 @@
 
         .btn-gerar { background: #27ae60; }
         .btn-limpar { background: #95a5a6; }
-        .btn-compartilhar { background: var(--whatsapp-green); width: 100%; margin-bottom: 10px; }
+        .btn-compartilhar { background: var(--whatsapp-green); width: 100%; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;}
 
-        .table-responsive { width: 100%; overflow-x: auto; margin-top: 15px; }
+        .table-responsive { width: 100%; overflow-x: auto; margin-top: 15px; border: 1px solid #ddd; }
 
-        table { width: 100%; border-collapse: collapse; min-width: 650px; }
+        table { width: 100%; border-collapse: collapse; background: white; min-width: 650px; }
 
-        th, td { border: 1px solid #000; padding: 5px; text-align: center; font-size: 0.8rem; }
+        th, td { border: 1px solid #000; padding: 6px 3px; text-align: center; font-size: 0.8rem; }
 
         th { background: var(--table-header); color: white; }
-        .line-number { background: var(--primary-orange); font-weight: bold; }
+        .line-number { background: var(--primary-orange); font-weight: bold; width: 35px; }
         .col-acertos { background: #eee; font-weight: bold; width: 60px; font-size: 1rem; }
         .premium { background-color: #d4edda !important; font-weight: bold; }
         .hit-cell { background-color: #f1c40f; color: black; font-weight: bold; }
 
-        footer { margin: 30px; font-weight: bold; }
+        footer { margin: 30px 0 20px 0; font-weight: bold; font-size: 1rem; color: #333; text-align: center; }
+
+        /* CSS DA TELA DE SENHA (ESTILO MODAL) */
+        #travaSeguranca {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #fce5cd;
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .box-senha {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            border: 4px solid #000;
+            box-shadow: 6px 6px 0px #000;
+            text-align: center;
+            width: 100%;
+            max-width: 350px;
+        }
+        .input-senha {
+            width: 100%;
+            padding: 15px;
+            margin: 15px 0;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        .btn-entrar {
+            width: 100%;
+            background: var(--primary-orange);
+            padding: 15px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
     </style>
 </head>
-<body oncontextmenu="return false;"> <div id="telaBloqueio">
-        <div class="login-box">
-            <img src="https://via.placeholder.com/100/f39c12/000000?text=GUINHO" style="border-radius: 50%; margin-bottom: 15px;" alt="Logo">
-            <h2>ÁREA EXCLUSIVA</h2>
-            <p>Digite a senha de acesso:</p>
-            <input type="password" id="inputSenha" class="input-senha" placeholder="Senha aqui...">
-            <button class="btn-entrar" onclick="verificarSenha()">Acessar Agora</button>
-            <p id="erroSenha" style="color: red; display: none; margin-top: 10px; font-weight: bold;">Senha Incorreta!</p>
+<body oncontextmenu="return false;">
+
+    <div id="travaSeguranca">
+        <div class="box-senha">
+            <h2 style="margin-top:0">🔒 ACESSO RESTRITO</h2>
+            <p>Informe a senha de acesso:</p>
+            <input type="password" id="campoSenha" class="input-senha" placeholder="SENHA">
+            <button class="btn-entrar" onclick="conferirSenha()">ACESSAR SITE</button>
+            <p id="msgErro" style="color:red; display:none; font-weight:bold; margin-top:10px">SENHA INCORRETA!</p>
         </div>
     </div>
 
-    <div id="conteudoSite">
-        <div class="header">
-            <h1>LOTINHA DO DESAFIO DO GUINHO</h1>
-        </div>
-
-        <div class="container">
-            <h3 style="color: var(--accent-red);">1. TIRE 3 DEZENAS</h3>
-            <div class="selector-grid" id="gridExcluir"></div>
-            <div class="info-box" id="statusExcluir">Selecione 3 dezenas para tirar.</div>
-
-            <div class="btn-group">
-                <button class="btn-acao btn-limpar" onclick="limparTudo()">LIMPAR</button>
-                <button class="btn-acao btn-gerar" onclick="gerarFechamento()">GERAR JOGOS</button>
-            </div>
-
-            <div id="resultadoArea" style="display:none;">
-                <hr>
-                <h3 style="color: var(--result-blue);">2. CONFERIDOR</h3>
-                <div class="selector-grid" id="gridConferir"></div>
-                <div class="info-box" id="statusConferir">Selecione os 15 números sorteados.</div>
-                
-                <button class="btn-acao btn-compartilhar" onclick="compartilhar()">📲 COMPARTILHAR JOGOS</button>
-                
-                <div class="table-responsive">
-                    <table id="tabelaJogos">
-                        <thead><tr id="headerTabela"></tr></thead>
-                        <tbody id="corpoTabela"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <footer>CRIADO POR GUINHO LOTOFACIL</footer>
+    <div class="header">
+        <h1>LOTINHA DO DESAFIO DO GUINHO</h1>
     </div>
+
+    <div class="container">
+        <h3 style="color: var(--accent-red); margin-top:0;">1. TIRE 3 DEZENAS</h3>
+        <div class="selector-grid" id="gridExcluir"></div>
+        <div class="info-box" id="statusExcluir">Aguardando seleção...</div>
+
+        <div class="btn-group">
+            <button class="btn-acao btn-limpar" onclick="limparTudo()">LIMPAR</button>
+            <button class="btn-acao btn-gerar" onclick="gerarFechamento()">GERAR JOGOS</button>
+        </div>
+
+        <div id="resultadoArea" style="display:none;">
+            <hr style="margin:20px 0">
+            <h3 style="color: var(--result-blue);">2. CONFERIDOR DE RESULTADO</h3>
+            <div class="selector-grid" id="gridConferir"></div>
+            <div class="info-box" id="statusConferir">Marque os 15 sorteados.</div>
+            
+            <button class="btn-acao btn-compartilhar" onclick="compartilhar()">📲 COMPARTILHAR JOGOS</button>
+            
+            <div class="table-responsive">
+                <table id="tabelaJogos">
+                    <thead><tr id="headerTabela"></tr></thead>
+                    <tbody id="corpoTabela"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer>CRIADO POR GUINHO LOTOFACIL</footer>
 
     <script>
-        const SENHA_MESTRA = "DESAFIO2@26";
-
-        // Verificar senha ao clicar no botão
-        function verificarSenha() {
-            const senhaDigitada = document.getElementById('inputSenha').value;
-            if (senhaDigitada === SENHA_MESTRA) {
-                document.getElementById('telaBloqueio').style.display = 'none';
-                document.getElementById('conteudoSite').style.display = 'flex';
-                // Salvar na sessão para não pedir denovo no refresh
-                localStorage.setItem('acessoGuinho', 'autorizado');
+        // LÓGICA DA SENHA
+        function conferirSenha() {
+            const senha = document.getElementById('campoSenha').value;
+            if (senha === "DESAFIO2@26") {
+                document.getElementById('travaSeguranca').style.display = 'none';
+                localStorage.setItem('guinho_auth', 'ok');
             } else {
-                document.getElementById('erroSenha').style.display = 'block';
-                setTimeout(() => { document.getElementById('erroSenha').style.display = 'none'; }, 2000);
+                document.getElementById('msgErro').style.display = 'block';
+                setTimeout(() => { document.getElementById('msgErro').style.display = 'none'; }, 2000);
             }
         }
 
-        // Checar se já foi autorizado antes
-        window.onload = () => {
-            if (localStorage.getItem('acessoGuinho') === 'autorizado') {
-                document.getElementById('telaBloqueio').style.display = 'none';
-                document.getElementById('conteudoSite').style.display = 'flex';
-            }
-            initGrids();
-        };
-
-        // --- LÓGICA DO SITE (MANTIDA) ---
+        // LÓGICA ORIGINAL DO SITE
         let excluidas = [];
         let sorteados = [];
         let jogosGerados = [];
+
+        window.onload = () => {
+            if (localStorage.getItem('guinho_auth') === 'ok') {
+                document.getElementById('travaSeguranca').style.display = 'none';
+            }
+            initGrids();
+        };
 
         function initGrids() {
             const gExcluir = document.getElementById('gridExcluir');
             const gConferir = document.getElementById('gridConferir');
             gExcluir.innerHTML = ''; gConferir.innerHTML = '';
-
             for (let i = 1; i <= 25; i++) {
                 let n = i.toString().padStart(2, '0');
                 let btnE = document.createElement('div');
@@ -271,7 +257,7 @@
                 else b.classList.remove('selected');
             });
             document.getElementById('statusExcluir').innerText = excluidas.length === 3 ? 
-                `Excluindo: ${excluidas.sort((a,b)=>a-b).join(' - ')}` : "Selecione 3 dezenas.";
+                `Excluindo: ${excluidas.sort((a,b)=>a-b).map(n=>n.toString().padStart(2,'0')).join(' - ')}` : "Selecione 3 dezenas.";
         }
 
         function gerarFechamento() {
@@ -328,7 +314,7 @@
             });
             texto += `\n_Criado por Guinho Lotofacil_`;
             if (navigator.share) await navigator.share({ title: 'Jogos do Guinho', text: texto });
-            else { navigator.clipboard.writeText(texto); alert("Copiado!"); }
+            else { navigator.clipboard.writeText(texto); alert("Jogos Copiados!"); }
         }
     </script>
 </body>
