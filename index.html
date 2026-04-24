@@ -16,6 +16,59 @@
 
         * { box-sizing: border-box; }
 
+        /* Estilo da Tela de Bloqueio */
+        #telaBloqueio {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #fce5cd;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .login-box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            border: 3px solid #000;
+            box-shadow: 6px 6px 0px #000;
+            max-width: 350px;
+            width: 100%;
+        }
+
+        .login-box h2 { margin-top: 0; color: #000; }
+
+        .input-senha {
+            width: 100%;
+            padding: 15px;
+            margin: 15px 0;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .btn-entrar {
+            width: 100%;
+            background: var(--primary-orange);
+            color: black;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        /* Ocultar o site inicialmente */
+        #conteudoSite { display: none; }
+
+        /* Estilos Originais do Site */
         body {
             font-family: 'Arial', sans-serif;
             background-color: #fce5cd;
@@ -61,7 +114,6 @@
             cursor: pointer;
             font-weight: bold;
             border-radius: 5px;
-            font-size: 1rem;
         }
 
         .dezena.selected { background-color: var(--accent-red); color: white; border-color: #c0392b; }
@@ -94,75 +146,97 @@
         .btn-limpar { background: #95a5a6; }
         .btn-compartilhar { background: var(--whatsapp-green); width: 100%; margin-bottom: 10px; }
 
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-            margin-top: 15px;
-        }
+        .table-responsive { width: 100%; overflow-x: auto; margin-top: 15px; }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 650px;
-        }
+        table { width: 100%; border-collapse: collapse; min-width: 650px; }
 
-        th, td {
-            border: 1px solid #000;
-            padding: 5px;
-            text-align: center;
-            font-size: 0.8rem;
-        }
+        th, td { border: 1px solid #000; padding: 5px; text-align: center; font-size: 0.8rem; }
 
         th { background: var(--table-header); color: white; }
         .line-number { background: var(--primary-orange); font-weight: bold; }
         .col-acertos { background: #eee; font-weight: bold; width: 60px; font-size: 1rem; }
         .premium { background-color: #d4edda !important; font-weight: bold; }
-        .hit-cell { background-color: #f1c40f; color: black; font-weight: bold; } /* Número que acertou */
+        .hit-cell { background-color: #f1c40f; color: black; font-weight: bold; }
 
         footer { margin: 30px; font-weight: bold; }
     </style>
 </head>
-<body>
-
-    <div class="header">
-        <h1>LOTINHA DO DESAFIO DO GUINHO</h1>
+<body oncontextmenu="return false;"> <div id="telaBloqueio">
+        <div class="login-box">
+            <img src="https://via.placeholder.com/100/f39c12/000000?text=GUINHO" style="border-radius: 50%; margin-bottom: 15px;" alt="Logo">
+            <h2>ÁREA EXCLUSIVA</h2>
+            <p>Digite a senha de acesso:</p>
+            <input type="password" id="inputSenha" class="input-senha" placeholder="Senha aqui...">
+            <button class="btn-entrar" onclick="verificarSenha()">Acessar Agora</button>
+            <p id="erroSenha" style="color: red; display: none; margin-top: 10px; font-weight: bold;">Senha Incorreta!</p>
+        </div>
     </div>
 
-    <div class="container">
-        <h3 style="color: var(--accent-red);">1. TIRE 3 DEZENAS</h3>
-        <div class="selector-grid" id="gridExcluir"></div>
-        <div class="info-box" id="statusExcluir">Selecione 3 dezenas para tirar.</div>
-
-        <div class="btn-group">
-            <button class="btn-acao btn-limpar" onclick="limparTudo()">LIMPAR</button>
-            <button class="btn-acao btn-gerar" onclick="gerarFechamento()">GERAR JOGOS</button>
+    <div id="conteudoSite">
+        <div class="header">
+            <h1>LOTINHA DO DESAFIO DO GUINHO</h1>
         </div>
 
-        <div id="resultadoArea" style="display:none;">
-            <hr>
-            <h3 style="color: var(--result-blue);">2. CONFERIDOR (INSIRA O SORTEIO)</h3>
-            <div class="selector-grid" id="gridConferir"></div>
-            <div class="info-box" id="statusConferir">Selecione os 15 números sorteados.</div>
-            
-            <button class="btn-acao btn-compartilhar" onclick="compartilhar()">📲 COMPARTILHAR JOGOS</button>
-            
-            <div class="table-responsive">
-                <table id="tabelaJogos">
-                    <thead><tr id="headerTabela"></tr></thead>
-                    <tbody id="corpoTabela"></tbody>
-                </table>
+        <div class="container">
+            <h3 style="color: var(--accent-red);">1. TIRE 3 DEZENAS</h3>
+            <div class="selector-grid" id="gridExcluir"></div>
+            <div class="info-box" id="statusExcluir">Selecione 3 dezenas para tirar.</div>
+
+            <div class="btn-group">
+                <button class="btn-acao btn-limpar" onclick="limparTudo()">LIMPAR</button>
+                <button class="btn-acao btn-gerar" onclick="gerarFechamento()">GERAR JOGOS</button>
+            </div>
+
+            <div id="resultadoArea" style="display:none;">
+                <hr>
+                <h3 style="color: var(--result-blue);">2. CONFERIDOR</h3>
+                <div class="selector-grid" id="gridConferir"></div>
+                <div class="info-box" id="statusConferir">Selecione os 15 números sorteados.</div>
+                
+                <button class="btn-acao btn-compartilhar" onclick="compartilhar()">📲 COMPARTILHAR JOGOS</button>
+                
+                <div class="table-responsive">
+                    <table id="tabelaJogos">
+                        <thead><tr id="headerTabela"></tr></thead>
+                        <tbody id="corpoTabela"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
+        <footer>CRIADO POR GUINHO LOTOFACIL</footer>
     </div>
 
-    <footer>CRIADO POR GUINHO LOTOFACIL</footer>
-
     <script>
+        const SENHA_MESTRA = "DESAFIO2@26";
+
+        // Verificar senha ao clicar no botão
+        function verificarSenha() {
+            const senhaDigitada = document.getElementById('inputSenha').value;
+            if (senhaDigitada === SENHA_MESTRA) {
+                document.getElementById('telaBloqueio').style.display = 'none';
+                document.getElementById('conteudoSite').style.display = 'flex';
+                // Salvar na sessão para não pedir denovo no refresh
+                localStorage.setItem('acessoGuinho', 'autorizado');
+            } else {
+                document.getElementById('erroSenha').style.display = 'block';
+                setTimeout(() => { document.getElementById('erroSenha').style.display = 'none'; }, 2000);
+            }
+        }
+
+        // Checar se já foi autorizado antes
+        window.onload = () => {
+            if (localStorage.getItem('acessoGuinho') === 'autorizado') {
+                document.getElementById('telaBloqueio').style.display = 'none';
+                document.getElementById('conteudoSite').style.display = 'flex';
+            }
+            initGrids();
+        };
+
+        // --- LÓGICA DO SITE (MANTIDA) ---
         let excluidas = [];
         let sorteados = [];
         let jogosGerados = [];
 
-        // Inicializar Grids
         function initGrids() {
             const gExcluir = document.getElementById('gridExcluir');
             const gConferir = document.getElementById('gridConferir');
@@ -170,8 +244,6 @@
 
             for (let i = 1; i <= 25; i++) {
                 let n = i.toString().padStart(2, '0');
-                
-                // Grid de Exclusão
                 let btnE = document.createElement('div');
                 btnE.className = 'dezena'; btnE.innerText = n;
                 btnE.onclick = () => {
@@ -181,7 +253,6 @@
                 };
                 gExcluir.appendChild(btnE);
 
-                // Grid de Conferência
                 let btnC = document.createElement('div');
                 btnC.className = 'dezena'; btnC.innerText = n;
                 btnC.onclick = () => {
@@ -205,17 +276,14 @@
 
         function gerarFechamento() {
             if(excluidas.length !== 3) return alert("Selecione 3 dezenas primeiro.");
-            
             let base = [];
             for(let i=1; i<=25; i++) if(!excluidas.includes(i)) base.push(i);
-
             jogosGerados = [];
             for(let j=0; j<6; j++) {
                 let jogo = [...base];
                 jogo.splice(j, 1);
                 jogosGerados.push(jogo);
             }
-
             document.getElementById('resultadoArea').style.display = 'block';
             conferirJogos();
         }
@@ -226,27 +294,21 @@
                 if(sorteados.includes(i+1)) b.classList.add('res-selected');
                 else b.classList.remove('res-selected');
             });
-
             document.getElementById('statusConferir').innerText = `Sorteados: ${sorteados.length}/15`;
-
             const corpo = document.getElementById('corpoTabela');
             const header = document.getElementById('headerTabela');
-            
             header.innerHTML = '<th>Jogo</th>' + Array.from({length: 21}, (_, i) => `<th>${i+1}</th>`).join('') + '<th>Acertos</th>';
             corpo.innerHTML = '';
-
             jogosGerados.forEach((jogo, idx) => {
                 let acertos = jogo.filter(n => sorteados.includes(n)).length;
                 let tr = document.createElement('tr');
                 if(acertos === 15) tr.className = 'premium';
-
                 let html = `<td class="line-number">${idx+1}</td>`;
                 jogo.forEach(num => {
                     let classe = sorteados.includes(num) ? 'hit-cell' : '';
                     html += `<td class="${classe}">${num.toString().padStart(2, '0')}</td>`;
                 });
                 html += `<td class="col-acertos">${acertos}</td>`;
-                
                 tr.innerHTML = html;
                 corpo.appendChild(tr);
             });
@@ -265,12 +327,9 @@
                 texto += `*J${i+1}:* ${j.map(n => n.toString().padStart(2, '0')).join(' ')}\n`;
             });
             texto += `\n_Criado por Guinho Lotofacil_`;
-
             if (navigator.share) await navigator.share({ title: 'Jogos do Guinho', text: texto });
             else { navigator.clipboard.writeText(texto); alert("Copiado!"); }
         }
-
-        initGrids();
     </script>
 </body>
 </html>
