@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOTINHA DO DESAFIO DO GUINHO</title>
+    <style>
+        :root {
+            --primary-orange: #f39c12;
+            --dark-bg: #1a1a1a;
+            --table-header: #34495e;
+            --accent-red: #e74c3c;
+            --whatsapp-green: #25d366;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #fce5cd;
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: var(--primary-orange);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            padding: 15px 10px;
+            border: 3px solid #000;
+            box-shadow: 4px 4px 0px #000;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.4rem; /* Ajustado para celular */
+            text-transform: uppercase;
+            font-weight: 900;
+        }
+
+        .container {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h3 { font-size: 1.1rem; margin-bottom: 15px; }
+
+        .selector-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .dezena {
+            padding: 12px 5px;
+            border: 2px solid #ccc;
+            background: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .dezena.selected {
+            background-color: var(--accent-red);
+            color: white;
+            border-color: #c0392b;
+        }
+
+        .info-box {
+            background: #d1e7dd;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border: 1px solid #badbcc;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .btn-acao {
+            width: 100%;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .btn-gerar { background: #27ae60; }
+        .btn-compartilhar { 
+            background: var(--whatsapp-green); 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* Container da tabela para scroll horizontal no celular */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 15px;
+            border: 1px solid #ddd;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            min-width: 600px; /* Garante que os números não fiquem espremidos */
+        }
+
+        th, td {
+            border: 1px solid #000;
+            padding: 6px 3px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        th { background-color: var(--table-header); color: white; }
+
+        footer {
+            margin: 30px 0 20px 0;
+            font-weight: bold;
+            font-size: 1rem;
+            color: #333;
+            text-align: center;
+        }
+
+        .line-number { background: #f39c12; font-weight: bold; width: 35px; }
+
+        @media (max-width: 480px) {
+            .header h1 { font-size: 1.2rem; }
+            .dezena { padding: 10px 2px; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>LOTINHA DO DESAFIO DO GUINHO</h1>
+    </div>
+
+    <div class="container">
+        <h3>ESCOLHA 3 DEZENAS PARA EXCLUIR:</h3>
+        <div class="selector-grid" id="gridDezenas"></div>
+
+        <div class="info-box" id="status">
+            Aguardando seleção...
+        </div>
+
+        <button class="btn-acao btn-gerar" onclick="gerarFechamento()">GERAR JOGOS</button>
+
+        <div id="resultadoArea" style="display:none;">
+            <button class="btn-acao btn-compartilhar" onclick="compartilhar()">
+                <i>📲</i> COMPARTILHAR NO WHATSAPP
+            </button>
+            
+            <div class="table-responsive">
+                <table id="tabelaJogos">
+                    <thead><tr id="headerTabela"></tr></thead>
+                    <tbody id="corpoTabela"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        CRIADO POR GUINHO LOTOFACIL
+    </footer>
+
+    <script>
+        const grid = document.getElementById('gridDezenas');
+        const status = document.getElementById('status');
+        let selecionadas = [];
+        let jogosGerados = [];
+
+        for (let i = 1; i <= 25; i++) {
+            const btn = document.createElement('div');
+            btn.className = 'dezena';
+            btn.innerText = i.toString().padStart(2, '0');
+            btn.onclick = () => toggleDezena(i, btn);
+            grid.appendChild(btn);
+        }
+
+        function toggleDezena(num, element) {
+            if (selecionadas.includes(num)) {
+                selecionadas = selecionadas.filter(n => n !== num);
+                element.classList.remove('selected');
+            } else if (selecionadas.length < 3) {
+                selecionadas.push(num);
+                element.classList.add('selected');
+            }
+            atualizarStatus();
+        }
+
+        function atualizarStatus() {
+            if(selecionadas.length === 0) status.innerText = "Selecione 3 dezenas.";
+            else status.innerText = `Excluindo: ${selecionadas.sort((a,b)=>a-b).map(n => n.toString().padStart(2, '0')).join(', ')}`;
+        }
+
+        function gerarFechamento() {
+            if (selecionadas.length !== 3) {
+                alert("Selecione exatamente 3 dezenas.");
+                return;
+            }
+
+            let dezenasBase = [];
+            for (let i = 1; i <= 25; i++) {
+                if (!selecionadas.includes(i)) dezenasBase.push(i);
+            }
+
+            const corpoTabela = document.getElementById('corpoTabela');
+            const headerTabela = document.getElementById('headerTabela');
+            corpoTabela.innerHTML = '';
+            headerTabela.innerHTML = '<th>Jogo</th>' + Array.from({length: 21}, (_, i) => `<th>${i+1}</th>`).join('');
+            
+            jogosGerados = [];
+
+            for (let j = 0; j < 6; j++) {
+                let jogo = [...dezenasBase];
+                jogo.splice(j, 1); // Técnica de rotação
+                jogosGerados.push(jogo);
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td class="line-number">${j + 1}</td>` + 
+                               jogo.map(d => `<td>${d.toString().padStart(2, '0')}</td>`).join('');
+                corpoTabela.appendChild(tr);
+            }
+
+            document.getElementById('resultadoArea').style.display = 'block';
+        }
+
+        async function compartilhar() {
+            let texto = `*LOTINHA DO DESAFIO DO GUINHO*\n`;
+            texto += `Excluídas: ${selecionadas.sort((a,b)=>a-b).join(' - ')}\n\n`;
+            
+            jogosGerados.forEach((jogo, i) => {
+                texto += `*Jogo ${i+1}:* ${jogo.map(d => d.toString().padStart(2, '0')).join(' ')}\n`;
+            });
+            
+            texto += `\n_Gerado por Guinho Lotofacil_`;
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({ title: 'Meus Jogos', text: texto });
+                } catch (err) { console.log("Erro ao compartilhar"); }
+            } else {
+                // Fallback: Copiar para área de transferência
+                navigator.clipboard.writeText(texto);
+                alert("Jogos copiados! Agora cole no WhatsApp.");
+            }
+        }
+    </script>
+</body>
+</html>
