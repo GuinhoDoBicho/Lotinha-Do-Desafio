@@ -11,6 +11,7 @@
             --table-header: #34495e;
             --accent-red: #e74c3c;
             --whatsapp-green: #25d366;
+            --neutral-gray: #95a5a6;
         }
 
         * { box-sizing: border-box; }
@@ -39,7 +40,7 @@
 
         .header h1 {
             margin: 0;
-            font-size: 1.4rem; /* Ajustado para celular */
+            font-size: 1.4rem;
             text-transform: uppercase;
             font-weight: 900;
         }
@@ -93,29 +94,37 @@
             font-weight: bold;
         }
 
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
         .btn-acao {
-            width: 100%;
+            flex: 1;
             color: white;
             padding: 15px;
             border: none;
             border-radius: 5px;
-            font-size: 1.1rem;
+            font-size: 1rem;
             cursor: pointer;
             font-weight: bold;
-            margin-bottom: 10px;
             text-transform: uppercase;
         }
 
         .btn-gerar { background: #27ae60; }
+        .btn-limpar { background: var(--neutral-gray); }
+        
         .btn-compartilhar { 
             background: var(--whatsapp-green); 
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
+            width: 100%;
+            margin-bottom: 15px;
         }
 
-        /* Container da tabela para scroll horizontal no celular */
         .table-responsive {
             width: 100%;
             overflow-x: auto;
@@ -127,7 +136,7 @@
             width: 100%;
             border-collapse: collapse;
             background: white;
-            min-width: 600px; /* Garante que os números não fiquem espremidos */
+            min-width: 600px;
         }
 
         th, td {
@@ -152,6 +161,7 @@
         @media (max-width: 480px) {
             .header h1 { font-size: 1.2rem; }
             .dezena { padding: 10px 2px; font-size: 0.9rem; }
+            .btn-acao { font-size: 0.9rem; padding: 12px; }
         }
     </style>
 </head>
@@ -169,11 +179,14 @@
             Aguardando seleção...
         </div>
 
-        <button class="btn-acao btn-gerar" onclick="gerarFechamento()">GERAR JOGOS</button>
+        <div class="btn-group">
+            <button class="btn-acao btn-limpar" onclick="limparTudo()">LIMPAR</button>
+            <button class="btn-acao btn-gerar" onclick="gerarFechamento()">GERAR JOGOS</button>
+        </div>
 
         <div id="resultadoArea" style="display:none;">
             <button class="btn-acao btn-compartilhar" onclick="compartilhar()">
-                <i>📲</i> COMPARTILHAR NO WHATSAPP
+                <i>📲</i> COMPARTILHAR JOGOS
             </button>
             
             <div class="table-responsive">
@@ -195,6 +208,7 @@
         let selecionadas = [];
         let jogosGerados = [];
 
+        // Inicializa o grid de dezenas
         for (let i = 1; i <= 25; i++) {
             const btn = document.createElement('div');
             btn.className = 'dezena';
@@ -215,13 +229,27 @@
         }
 
         function atualizarStatus() {
-            if(selecionadas.length === 0) status.innerText = "Selecione 3 dezenas.";
-            else status.innerText = `Excluindo: ${selecionadas.sort((a,b)=>a-b).map(n => n.toString().padStart(2, '0')).join(', ')}`;
+            if(selecionadas.length === 0) {
+                status.innerText = "Selecione 3 dezenas.";
+            } else {
+                status.innerText = `Excluindo: ${selecionadas.sort((a,b)=>a-b).map(n => n.toString().padStart(2, '0')).join(', ')}`;
+            }
+        }
+
+        function limparTudo() {
+            selecionadas = [];
+            jogosGerados = [];
+            // Remove a seleção visual
+            document.querySelectorAll('.dezena').forEach(el => el.classList.remove('selected'));
+            // Esconde os resultados
+            document.getElementById('resultadoArea').style.display = 'none';
+            document.getElementById('corpoTabela').innerHTML = '';
+            atualizarStatus();
         }
 
         function gerarFechamento() {
             if (selecionadas.length !== 3) {
-                alert("Selecione exatamente 3 dezenas.");
+                alert("Por favor, selecione exatamente 3 dezenas para excluir.");
                 return;
             }
 
@@ -237,9 +265,10 @@
             
             jogosGerados = [];
 
+            // Lógica de fechamento: Rotação para gerar 6 jogos de 21 a partir das 22 restantes
             for (let j = 0; j < 6; j++) {
                 let jogo = [...dezenasBase];
-                jogo.splice(j, 1); // Técnica de rotação
+                jogo.splice(j, 1); 
                 jogosGerados.push(jogo);
 
                 const tr = document.createElement('tr');
@@ -253,22 +282,21 @@
 
         async function compartilhar() {
             let texto = `*LOTINHA DO DESAFIO DO GUINHO*\n`;
-            texto += `Excluídas: ${selecionadas.sort((a,b)=>a-b).join(' - ')}\n\n`;
+            texto += `Excluídas: ${selecionadas.sort((a,b)=>a-b).map(d => d.toString().padStart(2, '0')).join(' - ')}\n\n`;
             
             jogosGerados.forEach((jogo, i) => {
                 texto += `*Jogo ${i+1}:* ${jogo.map(d => d.toString().padStart(2, '0')).join(' ')}\n`;
             });
             
-            texto += `\n_Gerado por Guinho Lotofacil_`;
+            texto += `\n_Criado por Guinho Lotofacil_`;
 
             if (navigator.share) {
                 try {
-                    await navigator.share({ title: 'Meus Jogos', text: texto });
+                    await navigator.share({ title: 'Jogos do Guinho', text: texto });
                 } catch (err) { console.log("Erro ao compartilhar"); }
             } else {
-                // Fallback: Copiar para área de transferência
                 navigator.clipboard.writeText(texto);
-                alert("Jogos copiados! Agora cole no WhatsApp.");
+                alert("Jogos copiados para a área de transferência!");
             }
         }
     </script>
